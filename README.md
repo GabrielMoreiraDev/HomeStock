@@ -72,8 +72,6 @@ The `Auth` and `Group` services interact synchronously via REST, while the `Inve
 
 A simplified diagram of the architecture:
 
-### 🗺️ Architecture Diagram (MVP)
-
 <img width="1695" height="1050" alt="image" src="https://github.com/user-attachments/assets/38871a2d-544f-4e30-bebc-ac65c69613a3" />
 
 ---
