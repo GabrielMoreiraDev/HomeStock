@@ -74,6 +74,16 @@ A simplified diagram of the architecture will be added soon:
 
 ---
 
+### 🧠 Future Improvements
+
+- Add **Shopping List Service** to consume stock-related Kafka events  
+- Implement **Purchase Service** for managing product acquisitions  
+- Introduce **Spring Cloud Gateway** for unified routing  
+- Add **frontend (React or Flutter)** for user interaction  
+- Deploy the full system using **Kubernetes** for orchestration
+
+---
+
 ### 👨‍💻 Author
 
 **Gabriel Ferreira Moreira**  
