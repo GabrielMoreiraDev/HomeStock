@@ -28,6 +28,17 @@ The main goal of this project is to demonstrate knowledge of distributed systems
 
 ---
 
+### 📋 Functional Requirements
+
+- Users can register and authenticate using JWT-based login.  
+- Each user can create and manage multiple household groups.  
+- Groups can have multiple members with different roles (admin / member).  
+- Each group maintains its own inventory of products.  
+- Products can be created, updated, and deleted by group admins.  
+- When a product’s quantity falls below a defined threshold, a Kafka event is emitted to trigger shopping list updates.
+
+---
+
 ### 🧱 Tech Stack
 
 | Category | Technologies |
