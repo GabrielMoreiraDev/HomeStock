@@ -4,6 +4,7 @@ import com.homestock.authservice.dto.UserCreateDto;
 import com.homestock.authservice.dto.UserDto;
 import com.homestock.authservice.exception.AlreadyExists;
 import com.homestock.authservice.exception.Invalid;
+import com.homestock.authservice.kafka.UserCreatedProducer;
 import com.homestock.authservice.mapper.UserMapper;
 import com.homestock.authservice.model.User;
 import com.homestock.authservice.repository.UserRepository;
@@ -17,6 +18,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
+    private final UserCreatedProducer userCreatedProducer;
 
     public UserDto register(UserCreateDto newUser) {
         if (userRepository.findByEmail(newUser.getEmail()).isPresent()) {
@@ -34,6 +36,7 @@ public class UserService {
                 .build();
 
         userRepository.save(user);
+        userCreatedProducer.sendUserCreatedEvent(user);
 
         return userMapper.toDTO(user);
     }
