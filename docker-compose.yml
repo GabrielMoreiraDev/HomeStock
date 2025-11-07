@@ -92,11 +92,15 @@ services:
     container_name: auth-service
     depends_on:
       - postgres-auth
+      - kafka
     ports:
       - "8080:8080"
     networks:
       - homestock-network
     restart: unless-stopped
+
+    env_file:
+      - ./auth-service/auth-service/.env
 
 # ======================
 # 🗄️ Volumes & Network
