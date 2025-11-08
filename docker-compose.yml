@@ -102,6 +102,27 @@ services:
     env_file:
       - ./auth-service/auth-service/.env
 
+  # ======================
+  # 🔐 Group Service
+  # ======================
+
+  group-service:
+    build:
+      context: ./group-service/group-service
+      dockerfile: Dockerfile
+    container_name: group-service
+    depends_on:
+      - postgres-group
+      - kafka
+    ports:
+      - "8081:8080"
+    networks:
+      - homestock-network
+    restart: unless-stopped
+
+    env_file:
+      - ./group-service/group-service/.env
+
 # ======================
 # 🗄️ Volumes & Network
 # ======================

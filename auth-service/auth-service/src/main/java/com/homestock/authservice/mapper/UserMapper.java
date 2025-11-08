@@ -9,7 +9,6 @@ public class UserMapper {
 
     public UserDto toDTO(User user) {
         UserDto dto = new UserDto();
-        dto.setId(user.getId());
         dto.setName(user.getName());
         dto.setEmail(user.getEmail());
         dto.setCreatedAt(user.getCreatedAt());
@@ -21,7 +20,6 @@ public class UserMapper {
         user.setCreatedAt(userDto.getCreatedAt());
         user.setEmail(userDto.getEmail());
         user.setName(userDto.getName());
-        user.setId(userDto.getId());
         return user;
     }
 }

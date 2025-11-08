@@ -1,4 +1,4 @@
-package com.homestock.authservice.dto;
+package com.homestock.group_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +11,10 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
-    private String email;
+public class GroupDto {
     private String name;
+    private String description;
+    private String access_code;
+    private Float budget;
     private LocalDateTime createdAt;
 }
