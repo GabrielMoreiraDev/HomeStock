@@ -89,6 +89,7 @@ public class UserService {
 
             Map<String, Object> claims = new HashMap<>();
             claims.put("name", user.getName());
+            claims.put("user_id", user.getId());
 
             var jwtToken = jwtService.generateToken(claims, user);
             var refreshToken = jwtService.generateRefreshToken(claims, user);

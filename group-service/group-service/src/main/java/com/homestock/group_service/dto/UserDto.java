@@ -11,11 +11,8 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroupDto {
+public class UserDto {
     private Long id;
     private String name;
-    private String description;
-    private String access_code;
-    private Float budget;
-    private LocalDateTime createdAt;
+    private String email;
 }

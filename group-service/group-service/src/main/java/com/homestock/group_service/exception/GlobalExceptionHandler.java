@@ -22,6 +22,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(409).body(ex.getMessage());
     }
 
+    @ExceptionHandler(NoPermission.class)
+    public ResponseEntity<String> handleAlreadyExists(NoPermission ex) {
+        return ResponseEntity.status(403).body(ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleUnexpected(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");

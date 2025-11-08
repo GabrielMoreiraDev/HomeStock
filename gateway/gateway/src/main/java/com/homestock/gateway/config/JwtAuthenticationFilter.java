@@ -2,6 +2,7 @@ package com.homestock.gateway.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -30,25 +31,34 @@ public class JwtAuthenticationFilter implements WebFilter {
 
         String jwt = authHeader.substring(7);
 
-        if (!jwtService.isTokenValid(jwt)) {
-            return chain.filter(exchange);
+        try {
+            if (!jwtService.isTokenValid(jwt)) {
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
+            }
+
+            String username = jwtService.extractUsername(jwt);
+            Integer user_id = jwtService.extractUserId(jwt);
+
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                    username,
+                    null,
+                    List.of(new SimpleGrantedAuthority("USER"))
+            );
+
+            String internalToken = internalJwtService.generateToken(username, List.of("USER"), user_id);
+
+            ServerWebExchange modifiedExchange = exchange.mutate()
+                    .request(r -> r.header("X-INTERNAL-TOKEN", internalToken))
+                    .build();
+
+            return chain.filter(modifiedExchange)
+                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+
+        } catch (io.jsonwebtoken.JwtException e) {
+            // Qualquer erro de JWT retorna 401
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
         }
-
-        String username = jwtService.extractUsername(jwt);
-
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                username,
-                null,
-                List.of(new SimpleGrantedAuthority("USER"))
-        );
-
-        String internalToken = internalJwtService.generateToken("gateway", List.of("USER"));
-
-        ServerWebExchange modifiedExchange = exchange.mutate()
-                .request(r -> r.header("X-INTERNAL-TOKEN", internalToken))
-                .build();
-
-        return chain.filter(modifiedExchange)
-                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
     }
 }

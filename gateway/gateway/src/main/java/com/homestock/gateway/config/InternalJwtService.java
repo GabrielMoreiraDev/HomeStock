@@ -23,13 +23,14 @@ public class InternalJwtService {
     @Value("${internal.jwt.issuer:gateway}")
     private String issuer;
 
-    public String generateToken(String username, List<String> roles) {
+    public String generateToken(String username, List<String> roles, Integer user_id) {
         Key key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(INTERNAL_SECRET));
 
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuer(issuer)
                 .claim("roles", roles)
+                .claim("user_id", user_id)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(key, SignatureAlgorithm.HS256)

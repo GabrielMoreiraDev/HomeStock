@@ -1,5 +1,6 @@
 package com.homestock.group_service.config;
 
+import com.homestock.group_service.model.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,8 +36,16 @@ public class GatewayTokenFilter extends OncePerRequestFilter {
             return;
         }
 
+        String userEmail = jwtService.extractSubject(token);
+        Integer user_id = jwtService.extractUserId(token);
+
+        User user = User.builder()
+                .email(userEmail)
+                .id(user_id)
+                .build();
+
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                "gateway",
+                user,
                 null,
                 List.of(new SimpleGrantedAuthority("ROLE_GATEWAY"))
         );

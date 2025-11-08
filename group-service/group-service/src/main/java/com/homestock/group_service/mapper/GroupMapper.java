@@ -9,6 +9,7 @@ public class GroupMapper {
 
     public GroupDto toDto(Group group) {
         GroupDto dto = new GroupDto();
+        dto.setId(group.getId());
         dto.setName(group.getName());
         dto.setBudget(group.getBudget());
         dto.setDescription(group.getDescription());
@@ -19,6 +20,7 @@ public class GroupMapper {
 
     public Group toEntity(GroupDto groupDto) {
         Group group = new Group();
+        group.setId(groupDto.getId());
         group.setName(groupDto.getName());
         group.setBudget(groupDto.getBudget());
         group.setDescription(groupDto.getDescription());

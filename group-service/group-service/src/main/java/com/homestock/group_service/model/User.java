@@ -28,6 +28,9 @@ public class User implements UserDetails {
     @jakarta.validation.constraints.Email
     private String email;
 
+    @Column(nullable = false, length = 100)
+    private String name;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

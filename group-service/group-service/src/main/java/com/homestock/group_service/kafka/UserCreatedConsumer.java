@@ -21,6 +21,7 @@ public class UserCreatedConsumer {
             User user = User.builder()
                     .id(event.getId())
                     .email(event.getEmail())
+                    .name(event.getName())
                     .build();
             userRepository.save(user);
 
