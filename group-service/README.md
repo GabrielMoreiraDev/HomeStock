@@ -24,7 +24,7 @@ Handles group creation, members management, and group-related operations for Hom
 
 ## 🗄️ Database Schema
 
-<img width="1000" height="544" alt="group" src="https://github.com/user-attachments/assets/e75d71f8-5867-40b1-8a54-af5e7974d5ed" />
+<img width="1000" height="544" alt="user" src="https://github.com/user-attachments/assets/5d5bba4a-7992-4065-a43f-2f6abd098663" />
 
 ---
 
