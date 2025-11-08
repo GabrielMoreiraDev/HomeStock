@@ -1,0 +1,116 @@
+services:
+  # ======================
+  # 🐘 PostgreSQL Databases
+  # ======================
+
+  postgres-auth:
+    image: postgres:15
+    container_name: postgres-auth
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_auth_data:/var/lib/postgresql/data
+    networks:
+      - homestock-network
+
+  postgres-group:
+    image: postgres:15
+    container_name: postgres-group
+    environment:
+      POSTGRES_DB: group_db
+      POSTGRES_USER: group_user
+      POSTGRES_PASSWORD: group_pass
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_group_data:/var/lib/postgresql/data
+    networks:
+      - homestock-network
+
+  postgres-inventory:
+    image: postgres:15
+    container_name: postgres-inventory
+    environment:
+      POSTGRES_DB: inventory_db
+      POSTGRES_USER: inventory_user
+      POSTGRES_PASSWORD: inventory_pass
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_inventory_data:/var/lib/postgresql/data
+    networks:
+      - homestock-network
+
+  # ======================
+  # 🐦 Kafka (Apache KRaft Mode)
+  # ======================
+
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      # Identificação e roles
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 1
+
+      # Configuração do cluster
+      KAFKA_CLUSTER_ID: kraft-cluster-id
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+
+      # Listeners
+      KAFKA_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+
+      # Configuração de tópicos e replicação
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+      # Armazenamento
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - homestock-network
+    restart: unless-stopped
+
+  # ======================
+  # 🔐 Auth Service
+  # ======================
+
+  auth-service:
+    build:
+      context: ./auth-service/auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    depends_on:
+      - postgres-auth
+      - kafka
+    ports:
+      - "8080:8080"
+    networks:
+      - homestock-network
+    restart: unless-stopped
+
+    env_file:
+      - ./auth-service/auth-service/.env
+
+# ======================
+# 🗄️ Volumes & Network
+# ======================
+volumes:
+  postgres_auth_data:
+  postgres_group_data:
+  postgres_inventory_data:
+  kafka_data:
+
+networks:
+  homestock-network:
+    driver: bridge
