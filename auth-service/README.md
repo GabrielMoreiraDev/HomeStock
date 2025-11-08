@@ -49,6 +49,3 @@ Handles user registration, authentication, and profile management for HomeStock.
 ```bash
 # Start Postgres and Kafka using Docker Compose
 docker compose up -d
-
-# Run Spring Boot app
-./mvnw spring-boot:run
