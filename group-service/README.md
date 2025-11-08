@@ -55,6 +55,3 @@ Handles group creation, members management, and group-related operations for Hom
 ```bash
 # Start Postgres and Kafka using Docker Compose
 docker compose up -d
-
-# Run Spring Boot app
-./mvnw spring-boot:run
