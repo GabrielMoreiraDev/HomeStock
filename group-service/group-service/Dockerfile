@@ -23,10 +23,10 @@ FROM eclipse-temurin:21-jdk
 WORKDIR /app
 
 # Copiar JAR buildado
-COPY --from=builder /app/target/auth-service-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=builder /app/target/group-service-0.0.1-SNAPSHOT.jar app.jar
 
 # Expor porta padrão
-EXPOSE 8082
+EXPOSE 8081
 
 # Rodar JAR
 ENTRYPOINT ["java", "-jar", "app.jar"]
