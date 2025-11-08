@@ -38,10 +38,9 @@ Handles user registration, authentication, and profile management for HomeStock.
 ## ⚙️ Environment Variables
 | Variable | Description |
 |-----------|-------------|
-| `DB_HOST` | Database hostname |
-| `DB_PORT` | Database port |
-| `DB_USER` | Database username |
-| `DB_PASSWORD` | Database password |
+| `SPRING_DATASOURCE_URL` | Database url |
+| `SPRING_DATASOURCE_USERNAME` | Database hostname |
+| `SPRING_DATASOURCE_PASSWORD` | Database password |
 | `JWT_SECRET` | Secret for token signing |
 
 ---
