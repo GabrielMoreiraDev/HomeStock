@@ -1,4 +1,4 @@
-package com.homestock.group_service.config;
+package com.homestock.gateway.config;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -14,13 +14,10 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    @Value("${internal.secret.token}")
-    private String INTERNAL_SECRET;
+    @Value("${json.secret.token}")
+    private String SECRET_KEY;
 
-    @Value("${internal.jwt.issuer:gateway}")
-    private String expectedIssuer;
-
-    public String extractSubject(String token) {
+    public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -28,29 +25,29 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    public String extractName(String token) {
+        return extractClaim(token, claims -> claims.get("name", String.class));
+    }
+
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
+        final Claims claims = extractClaims(token);
+
         return claimsResolver.apply(claims);
     }
 
-    public boolean isTokenValid(String token) {
-        try {
-            Claims claims = extractAllClaims(token);
-            String issuer = claims.getIssuer();
-            Date expiration = claims.getExpiration();
 
-            return expectedIssuer.equals(issuer) && expiration.after(new Date());
-        } catch (Exception e) {
-            return false;
-        }
+    public boolean isTokenValid(String token) {
+        final String username = extractUsername(token);
+        return !username.isBlank() && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
+    private Claims extractClaims(String token) {
+        return Jwts
+                .parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build()
                 .parseClaimsJws(token)
@@ -58,7 +55,9 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(INTERNAL_SECRET);
+        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
+
+

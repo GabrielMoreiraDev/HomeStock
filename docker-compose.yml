@@ -94,7 +94,7 @@ services:
       - postgres-auth
       - kafka
     ports:
-      - "8080:8080"
+      - "8082:8080"
     networks:
       - homestock-network
     restart: unless-stopped
@@ -122,6 +122,27 @@ services:
 
     env_file:
       - ./group-service/group-service/.env
+
+  # ======================
+  # 🔐 Gateway
+  # ======================
+
+  gateway:
+    build:
+      context: ./gateway/gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    depends_on:
+      - group-service
+      - auth-service
+    ports:
+      - "8080:8080"
+    networks:
+      - homestock-network
+    restart: unless-stopped
+
+    env_file:
+      - ./gateway/gateway/.env
 
 # ======================
 # 🗄️ Volumes & Network

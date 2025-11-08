@@ -14,7 +14,7 @@ public class UserGroupMapper {
         dto.setGroup_name(group.getName());
         dto.setGroup_description(group.getDescription());
         dto.setGroup_createdAt(group.getCreatedAt());
-        dto.setGroup_access_code(group.getAccess_code());
+        dto.setGroup_access_code(group.getAccessCode());
         dto.setUser_role(userGroup.getRole());
         dto.setUser_email(userGroup.getUser().getEmail());
         return dto;

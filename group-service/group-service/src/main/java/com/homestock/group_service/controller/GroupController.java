@@ -1,10 +1,10 @@
 package com.homestock.group_service.controller;
 
+import com.homestock.group_service.dto.GroupCreateDto;
+import com.homestock.group_service.dto.GroupDto;
 import com.homestock.group_service.service.GroupService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/group")
@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class GroupController {
     private final GroupService groupService;
 
-    @GetMapping
-    public String sayHello() {
-        return "Hello";
+    @PostMapping("/create")
+    public GroupDto createGroup(@RequestBody GroupCreateDto request) {
+        return groupService.createGroup(request);
     }
 }

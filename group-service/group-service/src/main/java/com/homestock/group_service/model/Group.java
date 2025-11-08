@@ -27,14 +27,15 @@ public class Group {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @Column()
     private String description;
 
-    @Column(nullable = false, length = 8)
-    private String access_code;
+    @Column(nullable = false, length = 8, unique = true)
+    private String accessCode;
 
-    @Column(nullable = false)
+    @Column()
     @DecimalMin(value = "0.0", inclusive = true, message = "Budget can not be negative")
-    private float budget;
+    private Float budget;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

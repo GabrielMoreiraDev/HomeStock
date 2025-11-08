@@ -13,7 +13,7 @@ public class GroupMapper {
         dto.setBudget(group.getBudget());
         dto.setDescription(group.getDescription());
         dto.setCreatedAt(group.getCreatedAt());
-        dto.setAccess_code(group.getAccess_code());
+        dto.setAccess_code(group.getAccessCode());
         return dto;
     }
 
@@ -23,7 +23,7 @@ public class GroupMapper {
         group.setBudget(groupDto.getBudget());
         group.setDescription(groupDto.getDescription());
         group.setCreatedAt(groupDto.getCreatedAt());
-        group.setAccess_code(groupDto.getAccess_code());
+        group.setAccessCode(groupDto.getAccess_code());
         return group;
     }
 }
