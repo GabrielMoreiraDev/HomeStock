@@ -1,13 +1,14 @@
 package com.homestock.group_service.service;
 
-import com.homestock.group_service.dto.GroupCreateDto;
-import com.homestock.group_service.dto.GroupDto;
-import com.homestock.group_service.dto.UserDto;
-import com.homestock.group_service.dto.UserGroupDto;
+import com.homestock.group_service.dto.*;
+import com.homestock.group_service.enums.Role;
 import com.homestock.group_service.exception.AlreadyExists;
 import com.homestock.group_service.exception.Invalid;
 import com.homestock.group_service.exception.NoPermission;
 import com.homestock.group_service.exception.NotFound;
+import com.homestock.group_service.kafka.UserGroupCreatedProducer;
+import com.homestock.group_service.kafka.UserGroupDeletedProducer;
+import com.homestock.group_service.kafka.UserGroupUpdatedProducer;
 import com.homestock.group_service.mapper.GroupMapper;
 import com.homestock.group_service.mapper.UserGroupMapper;
 import com.homestock.group_service.mapper.UserMapper;
@@ -19,22 +20,23 @@ import com.homestock.group_service.repository.UserGroupRepository;
 import com.homestock.group_service.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class GroupService {
-    private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final UserGroupRepository userGroupRepository;
+    private final UserRepository userRepository;
     private final GroupMapper groupMapper;
     private final UserGroupMapper userGroupMapper;
     private final UserMapper userMapper;
+    private final UserGroupCreatedProducer userGroupCreatedProducer;
+    private final UserGroupDeletedProducer userGroupDeletedProducer;
+    private final UserGroupUpdatedProducer userGroupUpdatedProducer;
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     private static final int CODE_LENGTH = 8;
@@ -49,7 +51,7 @@ public class GroupService {
         return code.toString();
     }
 
-    private UserGroup createUserGroup(User user, Group group, String role) {
+    private UserGroup createUserGroup(User user, Group group, Role role) {
         UserGroup userGroup = UserGroup.builder()
                 .user(user)
                 .group(group)
@@ -57,8 +59,13 @@ public class GroupService {
                 .build();
 
         userGroupRepository.save(userGroup);
+        userGroupCreatedProducer.sendUserGroupCreatedEvent(userGroup);
 
         return userGroup;
+    }
+
+    private boolean checkUser(User user) {
+        return userRepository.findById(user.getId()).isPresent();
     }
 
     public List<GroupDto> getUserGroups(User user) {
@@ -76,6 +83,10 @@ public class GroupService {
     }
 
     public GroupDto createGroup(GroupCreateDto newGroup, User user) {
+
+        if (!checkUser(user)) {
+            throw new NotFound("User could not be found");
+        }
 
         Group group = Group.builder()
                 .name(newGroup.getName())
@@ -101,7 +112,7 @@ public class GroupService {
             }
         }
 
-        createUserGroup(user, group, "ADMIN");
+        createUserGroup(user, group, Role.ADMIN);
 
         return groupMapper.toDto(group);
     }
@@ -112,11 +123,14 @@ public class GroupService {
 
         if (group.getId() != id) {
             throw new NoPermission("User is not part of the group");
-        } else if (!userGroup.getRole().equals("ADMIN")) {
+        } else if (!userGroup.getRole().equals(Role.ADMIN)) {
             throw new NoPermission("User does not have permission");
         }
 
         groupRepository.delete(group);
+        UserGroupDeletedEvent userGroupDeletedEvent = UserGroupDeletedEvent.builder()
+                        .id(userGroup.getId()).build();
+        userGroupDeletedProducer.sendUserGroupDeletedEvent(userGroupDeletedEvent);
     }
 
     public UserGroupDto joinGroup(String accessCode, User user) {
@@ -126,7 +140,7 @@ public class GroupService {
             throw new AlreadyExists("User is already part of the group!");
         }
 
-        UserGroup userGroup = createUserGroup(user, group, "USER");
+        UserGroup userGroup = createUserGroup(user, group, Role.USER);
 
         return userGroupMapper.toDto(group, userGroup);
     }
@@ -141,5 +155,36 @@ public class GroupService {
             userGroupRepository.delete(userGroup);
         }
 
+        UserGroupDeletedEvent userGroupDeletedEvent = UserGroupDeletedEvent.builder()
+                .id(userGroup.getId()).build();
+        userGroupDeletedProducer.sendUserGroupDeletedEvent(userGroupDeletedEvent);
+    }
+
+    public ToggleRoleDto toggleRole(Long groupId, User user, Long userId) {
+        if (user.getId() == userId) {
+            throw new Invalid("User can not change his own role!");
+        }
+
+        UserGroup userGroup = userGroupRepository.findByUserIdAndGroupId(user.getId(), groupId).orElseThrow(() -> new NoPermission("User is not part of the group!"));
+
+        if (userGroup.getRole().equals(Role.USER)) {
+            throw new NoPermission("User does not have permission!");
+        }
+
+        UserGroup member = userGroupRepository.findByUserIdAndGroupId(userId, groupId).orElseThrow(() -> new NoPermission("User is not part of the group!"));
+
+        if (member.getRole().equals(Role.ADMIN)) {
+            member.setRole(Role.USER);
+        } else {
+            member.setRole(Role.ADMIN);
+        }
+
+        userGroupRepository.save(member);
+
+        ToggleRoleDto toggleRoleDto = ToggleRoleDto.builder().userId(userId).groupId(groupId).role(member.getRole()).build();
+        UserGroupUpdatedEvent userGroupUpdatedEvent = UserGroupUpdatedEvent.builder().role(toggleRoleDto.getRole()).id(member.getId()).build();
+        userGroupUpdatedProducer.sendUserGroupUpdateEvent(userGroupUpdatedEvent);
+
+        return toggleRoleDto;
     }
 }

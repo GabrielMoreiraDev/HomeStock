@@ -1,5 +1,6 @@
 package com.homestock.group_service.model;
 
+import com.homestock.group_service.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UserGroup {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // ID próprio
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,8 +32,9 @@ public class UserGroup {
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String role;
+    private Role role;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

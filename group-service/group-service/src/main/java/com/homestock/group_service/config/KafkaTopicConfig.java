@@ -15,5 +15,21 @@ public class KafkaTopicConfig {
                 .replicas(1)
                 .build();
     }
+
+    @Bean
+    public NewTopic userGroupCreatedTopic() {
+        return TopicBuilder.name("userGroupCreated")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic userGroupDeletedTopic() {
+        return TopicBuilder.name("userGroupDeleted")
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
 }
 

@@ -22,7 +22,7 @@ import java.util.List;
 public class User implements UserDetails {
     @Id
     @Column(nullable = false, updatable = false)
-    private long id; // User ID (same as in Auth Service)
+    private long id;
 
     @Column(nullable = false, unique = true)
     @jakarta.validation.constraints.Email

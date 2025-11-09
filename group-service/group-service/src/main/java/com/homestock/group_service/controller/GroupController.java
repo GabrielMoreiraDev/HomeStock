@@ -1,9 +1,6 @@
 package com.homestock.group_service.controller;
 
-import com.homestock.group_service.dto.GroupCreateDto;
-import com.homestock.group_service.dto.GroupDto;
-import com.homestock.group_service.dto.UserDto;
-import com.homestock.group_service.dto.UserGroupDto;
+import com.homestock.group_service.dto.*;
 import com.homestock.group_service.model.User;
 import com.homestock.group_service.service.GroupService;
 import lombok.RequiredArgsConstructor;
@@ -49,5 +46,12 @@ public class GroupController {
     @GetMapping("/members/{groupId}")
     public List<UserDto> getMembers(@PathVariable Long groupId, @AuthenticationPrincipal User user) {
         return groupService.getMembers(groupId, user);
+    }
+
+    @PutMapping("/member/toggle-role/{groupId}/{userId}")
+    public ToggleRoleDto toggleUserRole(
+            @PathVariable Long groupId, @AuthenticationPrincipal User user, @PathVariable Long userId
+    ) {
+        return groupService.toggleRole(groupId, user, userId);
     }
 }
