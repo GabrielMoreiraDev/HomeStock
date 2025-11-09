@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 public class UserCreatedConsumer {
 
     private final UserRepository userRepository;
-    private final ObjectMapper objectMapper;
 
     @KafkaListener(topics = "userCreated", groupId = "group-service-consumer")
     public void consume(UserCreatedEvent event) {

@@ -124,6 +124,27 @@ services:
       - ./group-service/group-service/.env
 
   # ======================
+  # 🔐 Inventory Service
+  # ======================
+
+  inventory-service:
+    build:
+      context: ./inventory-service/inventory-service
+      dockerfile: Dockerfile
+    container_name: inventory-service
+    depends_on:
+      - postgres-inventory
+      - kafka
+    ports:
+      - "8083:8080"
+    networks:
+      - homestock-network
+    restart: unless-stopped
+
+    env_file:
+      - ./inventory-service/inventory-service/.env
+
+  # ======================
   # 🔐 Gateway
   # ======================
 

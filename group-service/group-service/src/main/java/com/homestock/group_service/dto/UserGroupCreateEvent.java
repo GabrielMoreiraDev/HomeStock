@@ -12,12 +12,9 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserGroupDto {
-    private String group_name;
-    private String group_description;
-    private String group_access_code;
-    private Float group_budget;
-    private LocalDateTime group_createdAt;
-    private String user_email;
-    private Role user_role;
+public class UserGroupCreateEvent {
+    private Long id;
+    private Long userId;
+    private Long groupId;
+    private Role role;
 }
