@@ -23,19 +23,32 @@ Handles stock management for a group in HomeStock.
 
 ## 🗄️ Database Schema
 
-<img width="440" height="438" alt="inventory" src="https://github.com/user-attachments/assets/10e40261-0d52-4470-be5b-2774b0dae16f" />
+<img width="860" height="438" alt="Inventory" src="https://github.com/user-attachments/assets/89cbbc01-4465-49a9-9062-3c1d800d2ebd" />
 
 ---
 
 ## 🧠 Kafka Integration
 
-TODO
+| Event | Direction | Description |
+|-------|-----------|-------------|
+| `userGroup.created` | Consumer | Consumed when a new userGroup is created |
+| `userGroup.updated` | Consumer | Consumed when a new userGroup is updated |
+| `userGroup.deleted` | Consumer | Consumed when a new userGroup is deleted |
+| `product.reachedThreshold` | Producer | Published when a product's quantity reaches threshold |
 
 ---
 
 ## ⚙️ Environment Variables
 
-TODO
+| Variable | Description |
+|-----------|-------------|
+| `SPRING_DATASOURCE_URL` | Database url |
+| `SPRING_DATASOURCE_USERNAME` | Database hostname |
+| `SPRING_DATASOURCE_PASSWORD` | Database password |
+| `JWT_SECRET` | Secret for token signing |
+| `INTERNAL_SECRET` | Secret for gateway validation |
+| `INTERNAL_SECRET_DURATION` | Duration of the token from the gateway |
+| `INTERNAL_SECRET_ISSUER` | Gateway |
 
 ---
 
