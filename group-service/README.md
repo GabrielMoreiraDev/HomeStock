@@ -33,11 +33,9 @@ Handles group creation, members management, and group-related operations for Hom
 | Event | Direction | Description |
 |-------|-----------|-------------|
 | `user.created` | Consumer | Consumed when a new user is created |
-| `group.created` | Producer | Published when a new group is created |
-| `group.updated` | Producer | Published when a group's metadata is updated |
-| `group.deleted` | Producer | Published when a group is deleted |
-| `group.member.added` | Producer | Published when a user is added to a group |
-| `group.member.removed` | Producer | Published when a user is removed from a group |
+| `userGroup.created` | Producer | Published when a new userGroup is created |
+| `userGroup.updated` | Producer | Published when a userGroup is updated |
+| `userGroup.deleted` | Producer | Published when a userGroup is deleted |
 
 ---
 
@@ -48,6 +46,10 @@ Handles group creation, members management, and group-related operations for Hom
 | `SPRING_DATASOURCE_USERNAME` | Database hostname |
 | `SPRING_DATASOURCE_PASSWORD` | Database password |
 | `JWT_SECRET` | Secret for token signing |
+| `INTERNAL_SECRET` | Secret for gateway validation |
+| `INTERNAL_SECRET_DURATION` | Duration of the token from the gateway |
+| `INTERNAL_SECRET_ISSUER` | Gateway |
+
 
 ---
 
