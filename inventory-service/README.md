@@ -1,14 +1,13 @@
-# Group Service
+# Inventory Service
 
-Handles group creation, members management, and group-related operations for HomeStock.
+Handles stock management for a group in HomeStock.
 
 ---
 
 ## 📋 Responsibilities
-- Create, update, and delete groups  
-- Add or remove users from groups  
-- Manage group metadata (name, description, owner, etc.)  
-- Publish group-related events to Kafka  
+- Create, update, and delete products
+- Register product consumption
+- Publish inventory-related events to Kafka  
 
 ---
 
@@ -24,7 +23,7 @@ Handles group creation, members management, and group-related operations for Hom
 
 ## 🗄️ Database Schema
 
-<img width="1000" height="544" alt="user" src="https://github.com/user-attachments/assets/5d5bba4a-7992-4065-a43f-2f6abd098663" />
+<img width="860" height="438" alt="Inventory" src="https://github.com/user-attachments/assets/89cbbc01-4465-49a9-9062-3c1d800d2ebd" />
 
 ---
 
@@ -32,14 +31,15 @@ Handles group creation, members management, and group-related operations for Hom
 
 | Event | Direction | Description |
 |-------|-----------|-------------|
-| `user.created` | Consumer | Consumed when a new user is created |
-| `userGroup.created` | Producer | Published when a new userGroup is created |
-| `userGroup.updated` | Producer | Published when a userGroup is updated |
-| `userGroup.deleted` | Producer | Published when a userGroup is deleted |
+| `userGroup.created` | Consumer | Consumed when a new userGroup is created |
+| `userGroup.updated` | Consumer | Consumed when a new userGroup is updated |
+| `userGroup.deleted` | Consumer | Consumed when a new userGroup is deleted |
+| `product.reachedThreshold` | Producer | Published when a product's quantity reaches threshold |
 
 ---
 
 ## ⚙️ Environment Variables
+
 | Variable | Description |
 |-----------|-------------|
 | `SPRING_DATASOURCE_URL` | Database url |
@@ -49,7 +49,6 @@ Handles group creation, members management, and group-related operations for Hom
 | `INTERNAL_SECRET` | Secret for gateway validation |
 | `INTERNAL_SECRET_DURATION` | Duration of the token from the gateway |
 | `INTERNAL_SECRET_ISSUER` | Gateway |
-
 
 ---
 

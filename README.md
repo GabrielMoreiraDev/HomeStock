@@ -5,12 +5,12 @@
 
 ### 📘 Overview
 
-**HomeStock** is a distributed backend application designed to help users manage their household inventory across multiple locations or groups.  
+**HomeStock** is a distributed backend system designed to help users manage their household inventory across multiple locations or groups.  
 Each user can create groups (e.g., “Home”, “Vacation House”) and track the products stored within each one.  
 Users can define items, monitor quantities, and automatically flag products that fall below a defined threshold.
 
-This MVP focuses on implementing a **microservices-based architecture** using **Spring Boot**, **Apache Kafka**, and **Docker**, demonstrating asynchronous communication between services and independent data persistence per domain.  
-The project serves both as a technical showcase and as the foundation for future development of a complete household stock management platform.
+This MVP showcases a **microservices architecture** using **Spring Boot**, **Apache Kafka**, and **Docker**, featuring asynchronous communication between services and independent data persistence per domain.  
+It serves as both a **technical reference project** and a **foundation for future extensions** of a complete household stock management platform.
 
 ---
 
@@ -22,7 +22,7 @@ The main goal of this project is to demonstrate knowledge of distributed systems
 - Implement a **microservices-based architecture** with Spring Boot  
 - Apply **Kafka** for asynchronous message exchange between services  
 - Use **PostgreSQL** as the database for each independent service  
-- Secure endpoints with **JWT authentication**  
+- Secure endpoints with **JWT authentication** and **internal service-to-service tokens**  
 - Containerize all services with **Docker Compose**  
 - Provide **API documentation** via Swagger / OpenAPI  
 
@@ -44,11 +44,11 @@ The main goal of this project is to demonstrate knowledge of distributed systems
 | Category | Technologies |
 |-----------|---------------|
 | **Backend Framework** | Spring Boot 3 |
-| **Programming Language** | Java 17+ |
+| **Programming Language** | Java 21 |
 | **Database** | PostgreSQL |
 | **Messaging** | Apache Kafka |
 | **Containerization** | Docker & Docker Compose |
-| **Security** | JWT (Spring Security) |
+| **Security** | JWT (Spring Security) + Internal JWT for microservice communication |
 | **API Documentation** | Swagger / OpenAPI |
 | **Build Tool** | Maven |
 | **Version Control** | Git & GitHub |
@@ -59,16 +59,22 @@ The main goal of this project is to demonstrate knowledge of distributed systems
 
 | Service | Description | Port |
 |----------|--------------|------|
-| **Auth Service** | Handles user registration, authentication, and JWT token management. | `8081` |
-| **Group Service** | Manages user groups and memberships. | `8082` |
+| **Gateway Service** | Handles routing, request forwarding, and internal JWT validation between services. | `8080` |
+| **Auth Service** | Handles user registration, authentication, and JWT token management. | `8082` |
+| **Group Service** | Manages user groups and memberships. | `8081` |
 | **Inventory Service** | Manages products and stock levels for each group, and emits Kafka events when thresholds are reached. | `8083` |
 
 ---
 
 ### ⚙️ Architecture
 
-The system follows a **microservices architecture**, where each service owns its own database and communicates through **REST** or **Kafka events** depending on the use case.  
-The `Auth` and `Group` services interact synchronously via REST, while the `Inventory` service emits Kafka events for asynchronous workflows (e.g., when a product quantity falls below the defined threshold).
+The system follows a microservices architecture, where each service owns its own database and communicates exclusively through Kafka events.
+There are no direct REST calls between microservices — instead, each service maintains minimal local copies of the data it needs, ensuring data consistency and eventual synchronization through event-driven communication.
+
+The Gateway acts as the single entry point for all external requests, handling authentication, authorization, and routing.
+It also issues an internal JWT token attached to outgoing requests, allowing microservices to verify that requests originate only from the gateway.
+
+This architecture promotes loose coupling, fault isolation, and scalability, following event-driven design principles.
 
 A simplified diagram of the architecture:
 
@@ -78,11 +84,11 @@ A simplified diagram of the architecture:
 
 ### 🧠 Future Improvements
 
-- Add **Shopping List Service** to consume stock-related Kafka events  
-- Implement **Purchase Service** for managing product acquisitions  
-- Introduce **Spring Cloud Gateway** for unified routing  
-- Add **frontend (React or Flutter)** for user interaction  
-- Deploy the full system using **Kubernetes** for orchestration
+- Add a **Shopping List Service** to consume stock-related Kafka events  
+- Implement a **Purchase Service** to handle product acquisitions and restocking  
+- Extend the **Gateway** with rate limiting, logging, and tracing (Spring Cloud Gateway)  
+- Add a **frontend (React or Flutter)** for user interaction  
+- Deploy the full system on **Kubernetes** with CI/CD pipelines  
 
 ---
 
@@ -93,5 +99,3 @@ Software Engineer passionate about distributed systems, event-driven architectur
 📍 Based in Porto, Portugal  
 
 [💼 LinkedIn](https://www.linkedin.com/in/gf-moreira/) • [🐙 GitHub](https://github.com/GabrielMoreiraDev)
-
-
