@@ -1,0 +1,32 @@
+name: CI Pipeline
+
+on:
+    push:
+        branches: [main, dev]
+    pull_request:
+        branches: [main, dev]
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Build and start Docker Compose
+              run: |
+                  docker-compose build
+                  docker-compose up -d
+
+            - name: Wait for services to be healthy
+              run: sleep 30 # simples, ou você pode fazer healthcheck específico
+
+            - name: Smoke tests
+              run: |
+                  curl -f http://localhost:8080/api/auth/actuator/health
+                  curl -f http://localhost:8080/api/group/actuator/health
+                  curl -f http://localhost:8080/api/inventory/actuator/health
+
+            - name: Stop Docker Compose
+              run: docker-compose down

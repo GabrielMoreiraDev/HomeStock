@@ -28,5 +28,9 @@ COPY --from=builder /app/target/gateway-0.0.1-SNAPSHOT.jar app.jar
 # Expor porta padrão
 EXPOSE 8080
 
+# HEALTHCHECK para CI/CD
+HEALTHCHECK --interval=10s --timeout=5s --retries=10 \
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
+
 # Rodar JAR
 ENTRYPOINT ["java", "-jar", "app.jar"]
