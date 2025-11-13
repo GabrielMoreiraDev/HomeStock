@@ -15,42 +15,72 @@ jobs:
               uses: actions/checkout@v3
 
             # ======================
-            # Build e start via Docker Compose
+            # Create .env files for each microservice
+            # ======================
+            - name: Create .env files for all services
+              run: |
+                  echo "📦 Creating .env files..."
+
+                  # --- Auth Service ---
+                  mkdir -p auth-service/auth-service
+                  cat <<EOF > auth-service/auth-service/.env
+                  SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-auth:5432/auth_db
+                  SPRING_DATASOURCE_USERNAME=auth_user
+                  SPRING_DATASOURCE_PASSWORD=auth_pass
+                  JWT_SECRET=dummysecret
+                  EOF
+
+                  # --- Group Service ---
+                  mkdir -p group-service/group-service
+                  cat <<EOF > group-service/group-service/.env
+                  SPRING_DATASOURCE_URL_GROUP=jdbc:postgresql://postgres-group:5432/group_db
+                  SPRING_DATASOURCE_USERNAME_GROUP=group_user
+                  SPRING_DATASOURCE_PASSWORD_GROUP=group_pass
+                  JWT_SECRET=dummysecret
+                  INTERNAL_SECRET=dummysecret2
+                  INTERNAL_SECRET_DURATION=300000
+                  INTERNAL_SECRET_ISSUER=gateway
+                  EOF
+
+                  # --- Inventory Service ---
+                  mkdir -p inventory-service/inventory-service
+                  cat <<EOF > inventory-service/inventory-service/.env
+                  SPRING_DATASOURCE_URL_INVENTORY=jdbc:postgresql://postgres-inventory:5432/inventory_db
+                  SPRING_DATASOURCE_USERNAME_INVENTORY=inventory_user
+                  SPRING_DATASOURCE_PASSWORD_INVENTORY=inventory_pass
+                  JWT_SECRET=dummysecret
+                  INTERNAL_SECRET=dummysecret2
+                  INTERNAL_SECRET_DURATION=300000
+                  INTERNAL_SECRET_ISSUER=gateway
+                  EOF
+
+                  # --- Gateway ---
+                  mkdir -p gateway/gateway
+                  cat <<EOF > gateway/gateway/.env
+                  JWT_SECRET=dummysecret
+                  INTERNAL_SECRET=dummysecret2
+                  INTERNAL_SECRET_DURATION=300000
+                  INTERNAL_SECRET_ISSUER=gateway
+                  EOF
+
+                  echo "✅ .env files created successfully."
+
+            # ======================
+            # Build and start Docker Compose
             # ======================
             - name: Build and start Docker Compose
               run: |
                   docker compose build
                   docker compose up -d
-              env:
-                  # ===== Auth Service =====
-                  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth:5432/auth_db
-                  SPRING_DATASOURCE_USERNAME: auth_user
-                  SPRING_DATASOURCE_PASSWORD: auth_pass
-
-                  # ===== Group Service =====
-                  SPRING_DATASOURCE_URL_GROUP: jdbc:postgresql://postgres-group:5432/group_db
-                  SPRING_DATASOURCE_USERNAME_GROUP: group_user
-                  SPRING_DATASOURCE_PASSWORD_GROUP: group_pass
-
-                  # ===== Inventory Service =====
-                  SPRING_DATASOURCE_URL_INVENTORY: jdbc:postgresql://postgres-inventory:5432/inventory_db
-                  SPRING_DATASOURCE_USERNAME_INVENTORY: inventory_user
-                  SPRING_DATASOURCE_PASSWORD_INVENTORY: inventory_pass
-
-                  # ===== Gateway =====
-                  JWT_SECRET: dummysecret
-                  INTERNAL_SECRET: dummysecret2
-                  INTERNAL_SECRET_DURATION: 30000
-                  INTERNAL_SECRET_ISSUER: gateway
 
             # ======================
-            # Esperar containers ficarem prontos
+            # Wait for services to be healthy
             # ======================
             - name: Wait for services to be healthy
               run: sleep 30
 
             # ======================
-            # Testar health endpoints via gateway
+            # Smoke tests
             # ======================
             - name: Smoke tests
               run: |
@@ -59,7 +89,7 @@ jobs:
                   curl -f http://localhost:8080/api/inventory/actuator/health
 
             # ======================
-            # Parar e limpar containers
+            # Stop and clean containers
             # ======================
             - name: Stop Docker Compose
               run: docker compose down
