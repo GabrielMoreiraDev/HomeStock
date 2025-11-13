@@ -14,19 +14,52 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v3
 
+            # ======================
+            # Build e start via Docker Compose
+            # ======================
             - name: Build and start Docker Compose
               run: |
                   docker compose build
                   docker compose up -d
+              env:
+                  # ===== Auth Service =====
+                  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-auth:5432/auth_db
+                  SPRING_DATASOURCE_USERNAME: auth_user
+                  SPRING_DATASOURCE_PASSWORD: auth_pass
 
+                  # ===== Group Service =====
+                  SPRING_DATASOURCE_URL_GROUP: jdbc:postgresql://postgres-group:5432/group_db
+                  SPRING_DATASOURCE_USERNAME_GROUP: group_user
+                  SPRING_DATASOURCE_PASSWORD_GROUP: group_pass
+
+                  # ===== Inventory Service =====
+                  SPRING_DATASOURCE_URL_INVENTORY: jdbc:postgresql://postgres-inventory:5432/inventory_db
+                  SPRING_DATASOURCE_USERNAME_INVENTORY: inventory_user
+                  SPRING_DATASOURCE_PASSWORD_INVENTORY: inventory_pass
+
+                  # ===== Gateway =====
+                  JWT_SECRET: dummysecret
+                  INTERNAL_SECRET: dummysecret2
+                  INTERNAL_SECRET_DURATION: 30000
+                  INTERNAL_SECRET_ISSUER: gateway
+
+            # ======================
+            # Esperar containers ficarem prontos
+            # ======================
             - name: Wait for services to be healthy
-              run: sleep 30 # simples, ou você pode fazer healthcheck específico
+              run: sleep 30
 
+            # ======================
+            # Testar health endpoints via gateway
+            # ======================
             - name: Smoke tests
               run: |
                   curl -f http://localhost:8080/api/auth/actuator/health
                   curl -f http://localhost:8080/api/group/actuator/health
                   curl -f http://localhost:8080/api/inventory/actuator/health
 
+            # ======================
+            # Parar e limpar containers
+            # ======================
             - name: Stop Docker Compose
               run: docker compose down
