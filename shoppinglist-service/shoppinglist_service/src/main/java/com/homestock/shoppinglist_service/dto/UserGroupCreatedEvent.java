@@ -1,0 +1,18 @@
+package com.homestock.shoppinglist_service.dto;
+
+import com.homestock.shoppinglist_service.enums.Role;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserGroupCreatedEvent {
+    private Long id;
+    private Long userId;
+    private Long groupId;
+    private Role role;
+}

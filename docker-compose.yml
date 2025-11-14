@@ -45,6 +45,20 @@ services:
     networks:
       - homestock-network
 
+  postgres-shoppinglist:
+    image: postgres:15
+    container_name: postgres-shoppinglist
+    environment:
+      POSTGRES_DB: shoppinglist_db
+      POSTGRES_USER: ${POSTGRES_USER_SHOPPINGLIST:-shoppinglist_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_SHOPPINGLIST:-shoppinglist_pass}
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_shoppinglist_data:/var/lib/postgresql/data
+    networks:
+      - homestock-network
+
   # ======================
   # 🐦 Kafka (Apache KRaft Mode)
   # ======================
@@ -131,6 +145,22 @@ services:
     restart: unless-stopped
     env_file:
       - ./inventory-service/inventory-service/.env
+
+  shoppinglist-service:
+    build:
+      context: ./shoppinglist-service/shoppinglist-service
+      dockerfile: Dockerfile
+    container_name: shoppinglist-service
+    depends_on:
+      - postgres-shoppinglist
+      - kafka
+    ports:
+      - "8084:8080"
+    networks:
+      - homestock-network
+    restart: unless-stopped
+    env_file:
+      - ./shoppinglist-service/shoppinglist-service/.env
 
   # ======================
   # 🌐 Gateway

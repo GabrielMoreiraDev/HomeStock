@@ -31,9 +31,9 @@ public class ProductService {
         return userGroupRepository.findByUserIdAndGroupId(user.getId(), groupId).isEmpty();
     }
 
-    private boolean checkUserRole(User user, Long groupId, Role role) {
+    private boolean checkUserRole(User user, Long groupId) {
         return userGroupRepository.findByUserIdAndGroupId(user.getId(), groupId).orElseThrow(
-                () -> new NotFound("Information not found")).getRole().equals(role);
+                () -> new NotFound("Information not found")).getRole().equals(Role.ADMIN);
     }
 
     public ProductDto createProduct(ProductCreateDto productCreateDto, User user, Long groupId) {
@@ -62,7 +62,7 @@ public class ProductService {
     public void deleteProduct(User user, Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new NotFound("Product not found"));
 
-        if (!checkUserRole(user, product.getGroupId(), Role.ADMIN)) {
+        if (!checkUserRole(user, product.getGroupId())) {
             throw new NoPermission("User does not have permission!");
         }
 
