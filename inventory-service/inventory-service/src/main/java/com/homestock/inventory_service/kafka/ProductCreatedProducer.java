@@ -2,6 +2,7 @@ package com.homestock.inventory_service.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.homestock.inventory_service.dto.ProductCreatedEvent;
 import com.homestock.inventory_service.dto.ProductReachedThresholdEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -9,18 +10,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ProductReachedThresholdProducer {
-    private static final String TOPIC = "productReachedThreshold";
+public class ProductCreatedProducer {
+    private static final String TOPIC = "productCreated";
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    public void sendProductReachedThreshold(ProductReachedThresholdEvent event) {
+    public void sendProductCreate(ProductCreatedEvent event) {
         try {
             String listItemJson = objectMapper.writeValueAsString(event);
             kafkaTemplate.send(TOPIC, listItemJson);
-            System.out.println("✅ ProductReachedThresholdEvent sent: " + listItemJson);
+            System.out.println("✅ ProductCreated sent: " + listItemJson);
         } catch (JsonProcessingException e) {
-            System.err.println("❌ Error serializing event: " + e.getMessage());
+            System.err.println("❌ Error serializing product: " + e.getMessage());
         }
     }
 }

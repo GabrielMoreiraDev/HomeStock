@@ -1,13 +1,11 @@
 package com.homestock.inventory_service.service;
 
-import com.homestock.inventory_service.dto.ProductCreateDto;
-import com.homestock.inventory_service.dto.ProductDto;
-import com.homestock.inventory_service.dto.ProductReachedThresholdEvent;
-import com.homestock.inventory_service.dto.UpdateProductQuantityDto;
+import com.homestock.inventory_service.dto.*;
 import com.homestock.inventory_service.enums.Role;
 import com.homestock.inventory_service.exception.Invalid;
 import com.homestock.inventory_service.exception.NoPermission;
 import com.homestock.inventory_service.exception.NotFound;
+import com.homestock.inventory_service.kafka.ProductCreatedProducer;
 import com.homestock.inventory_service.kafka.ProductReachedThresholdProducer;
 import com.homestock.inventory_service.mapper.ProductMapper;
 import com.homestock.inventory_service.model.Product;
@@ -26,6 +24,7 @@ public class ProductService {
     private final UserGroupRepository userGroupRepository;
     private final ProductMapper productMapper;
     private final ProductReachedThresholdProducer productReachedThresholdProducer;
+    private final ProductCreatedProducer productCreatedProducer;
 
     private boolean checkUserNotInGroup(User user, Long groupId) {
         return userGroupRepository.findByUserIdAndGroupId(user.getId(), groupId).isEmpty();
@@ -45,6 +44,13 @@ public class ProductService {
         newProduct.setGroupId(groupId);
 
         productRepository.save(newProduct);
+
+        ProductCreatedEvent productCreatedEvent = ProductCreatedEvent.builder()
+                .id(newProduct.getId())
+                .groupId(newProduct.getGroupId())
+                .build();
+
+        productCreatedProducer.sendProductCreate(productCreatedEvent);
 
         return productMapper.toDto(newProduct);
     }

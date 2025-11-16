@@ -5,18 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ListItemDto {
+public class ProductCreatedEvent {
     private Long id;
     private Long groupId;
-    private Long productId;
-    private Float quantity;
-    private String note;
-    private int position;
-    private LocalDateTime createdAt;
 }

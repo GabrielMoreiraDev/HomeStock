@@ -24,11 +24,7 @@ public class ListItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(nullable = false)
-    @DecimalMin(value = "0.0", inclusive = false, message = "Group_id can not be 0 or less!")
-    private Long groupId;
-
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @DecimalMin(value = "0.0", inclusive = false, message = "Group_id can not be 0 or less!")
     private Long productId;
 
@@ -41,7 +37,7 @@ public class ListItem {
 
     @Column(nullable = false)
     @DecimalMin(value = "0.0", inclusive = true, message = "Position can not be negative!")
-    private Long position;
+    private int position;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

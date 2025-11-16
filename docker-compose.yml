@@ -148,7 +148,7 @@ services:
 
   shoppinglist-service:
     build:
-      context: ./shoppinglist-service/shoppinglist-service
+      context: ./shoppinglist-service/shoppinglist_service
       dockerfile: Dockerfile
     container_name: shoppinglist-service
     depends_on:
@@ -160,7 +160,7 @@ services:
       - homestock-network
     restart: unless-stopped
     env_file:
-      - ./shoppinglist-service/shoppinglist-service/.env
+      - ./shoppinglist-service/shoppinglist_service/.env
 
   # ======================
   # 🌐 Gateway
@@ -189,6 +189,7 @@ volumes:
   postgres_auth_data:
   postgres_group_data:
   postgres_inventory_data:
+  postgres_shoppinglist_data:
   kafka_data:
 
 networks:
